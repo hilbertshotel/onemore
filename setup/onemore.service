@@ -1,0 +1,13 @@
+[Unit]
+Description=onemore
+
+[Service]
+Restart=always
+RestartSec=30s
+WorkingDirectory=/home/ubuntu/src/onemore
+ExecStart=/home/ubuntu/src/onemore/onemore
+StandardOutput=append:/home/ubuntu/src/onemore/logs/onemore.log
+StandardError=append:/home/ubuntu/src/onemore/logs/onemore.log
+
+[Install]
+WantedBy=multi-user.target
