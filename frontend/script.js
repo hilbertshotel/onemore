@@ -1,53 +1,93 @@
-// server address
-const ADDR = "http://3.72.23.143"
+// HOST ADDRESS
+// const ADDR = "http://3.72.23.143"
+const ADDR = "http://127.0.0.1:7696"
+const HABITS_DIV = document.getElementById("habits")
 
-// update habit
-const updateHabit = (id, button, habit, habitSpan) => {
+// PUT HABIT
+const updateHabit = async (id, button, habit, habitSpan) => {
+    const data = {method: "PUT"}
+    const response = await fetch(`${ADDR}/habits/${id}`, data)
     
-     
+    if (!response.ok) {
+      console.log(`status: ${response.status} text: ${response.statusText}`)
+      return
+    }
 
     button.remove()
     habitSpan.innerHTML = `${habit.Name} ${habit.Days+=1}`
-    console.log(id)
 }
 
-// post habit
-const postHabit = () => {
-    console.log("post")
+// POST HABIT
+const postHabit = async () => {
+    const inputValue = document.getElementById("new_habit").value
+    if (inputValue === "") {
+      return
+    }
+
+    const data = { 
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(inputValue)
+    }
+
+    const response = await fetch(`${ADDR}/habits/`, data)
+    if (!response.ok) {
+      console.log(`status: ${response.status} text: ${response.statusText}`)
+      return
+    }
+
+    const habit = await response.json()
+    addToDom([habit])
 }
 
-// get habits
+// GET HABIT
 const getHabits = async () => {
     const response = await fetch(`${ADDR}/habits`)
-    if (response.ok) {
-        const habits = await response.json()
-        return habits
+    if (!response.ok) {
+        console.log(`status: ${response.status} text: ${response.statusText}`)
+        return []
     }
-    console.log(`status: ${response.status} text: ${response.statusText}`)
+    const habits = await response.json()
+    return habits
 }
 
-// on page start
-const main = async () => {
-    const habitsDiv = document.getElementById("habits")
-    const habits = await getHabits()
+// CREATE HABIT
+const createHabit = (habit) => {
+    let out = []
     
-    for (const habit of habits) {
-        const habitSpan = document.createElement("span")
-        const br = document.createElement("br")
+    const habitSpan = document.createElement("span")
+    habitSpan.innerHTML = `${habit.Name} ${habit.Days}`
+    out.push(habitSpan)
+    
+    if (!habit.Inc) {
         const button = document.createElement("button")
-        habitSpan.innerHTML = `${habit.Name} ${habit.Days}`
-        
-        habitsDiv.append(habitSpan)
-        if (!habit.Inc) {
-            const button = document.createElement("button")
-            button.innerHTML = "+"
-            button.onclick = () => { updateHabit(habit.Id, button, habit, habitSpan) }
-            habitsDiv.append(button)
-        }
-        habitsDiv.append(br)
+        button.innerHTML = "+"
+        button.onclick = () => { updateHabit(habit.Id, button, habit, habitSpan) }
+        out.push(button)
     }
 
+    const br = document.createElement("br")
+    out.push(br)
+
+    return out
+}
+
+// ADD HABITS TO DOM
+const addToDom = (habits) => {
+  for (const habit of habits) {
+    const h = createHabit(habit)
+    for (const e of h) {
+      HABITS_DIV.append(e)
+    }
+  }
+}
+
+// ON STARTUP
+const main = async () => {
+    const habits = await getHabits()
+    addToDom(habits)
 }
 
 main()
-

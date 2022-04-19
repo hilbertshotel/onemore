@@ -11,14 +11,8 @@ Info:
     If the habit is not incremented until the end of a new day,
     it is automatically erased.
 
-    Originally I had implemented a counter for the longest streak
-    but then I changed my mind. No data is stored. Even if you've
-    practiced a habit for 300 days, if you skip a day, you have to
-    start over. Don't be fooled by achievements. The past is irrelevant.
-
-Misc:
-    And she remembered, of course she remembered, the tough sessions in Sierra Nevada in June
-    at the last concentration before flying to Japan, when she was exhausted, but Del Moral
-    asked her to repeat the Chatanyara Kushanku. “One more time, one more, one more. And look,
-    it was worth it,“ he says.
+    Originally I implemented a counter for the longest streak
+    but changed my mind. No data is ever stored. Even if you've
+    practiced a habit for 300 days, skip one day and your streak
+    is lost. Don't be fooled by achievements. The past is irrelevant.
 ```
