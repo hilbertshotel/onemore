@@ -1,3 +1,39 @@
+:root {
+  --background: #e7d9ad;
+  --button: #5c4710;
+  --incFalse: #898723;
+  --incTrue: #e1736c;
+}
+
+body {
+  margin: 0;
+  text-align: center;
+  font-size: 1.3rem;
+  background-color: var(--background);
+}
+
+input {
+  font-size: 1.3rem;
+  text-align: center;
+}
+
 button {
-    background-color: greenyellow;
+  background-color: var(--button);
+  font-size: 1.3rem;
+  padding: 0 .3rem 0 .3rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border: .1rem solid black;
+}
+
+#habit {
+  display: inline-block;
+  background-color: var(--incFalse);
+  color: var(--button);
+  margin-bottom: .8rem;
+  padding: 0.6rem;
+  user-select: none;
+  border-radius: .5rem;
+  cursor: pointer;
 }

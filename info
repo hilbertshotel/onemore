@@ -1,0 +1,14 @@
+[RELEASE DOCUMENT]
+1. change ADDRESS of script.js
+2. go build
+3. sudo systemctl restart onemore.service
+
+[DEPENDENCIES]
+1. MongoDB
+2. Go
+3. Nginx
+4. Systemd
+5. Git
+
+
+MAKE mongo run on restart

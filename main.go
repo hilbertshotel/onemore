@@ -1,35 +1,53 @@
 package main
 
 import (
-    "net/http"
-    "onemore/config"
-    "onemore/logger"
-    "onemore/handlers"
+	"context"
+	"net/http"
+	"onemore/config"
+	"onemore/handlers"
+	"onemore/logger"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-    
-    // init logger
-    log := logger.Init()
-    log.Ok("Logger initiated.")
 
-    // init config
-    cfg := config.Init()
-    log.Ok("Config initiated.")
+	// init logger
+	log := logger.Init()
+	log.Ok("Logger initiated")
 
-    // init server
-    server := http.Server{
-        Addr: cfg.HostAddr,
-        Handler: handlers.Mux(log, cfg),
-    }
+	// init config
+	cfg := config.Init()
+	log.Ok("Config initiated")
 
-    // start server
-    ch := make(chan error)
+	// connect to database
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.Mongo.Timeout)
+	defer cancel()
 
-    go func(ch chan error) {
-        log.Ok("Server listening on " + cfg.HostAddr)
-        ch<-server.ListenAndServe()
-    }(ch)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.Mongo.Uri))
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	defer client.Disconnect(ctx)
 
-    log.Error(<-ch)
+	coll := client.Database(cfg.Mongo.Database).Collection(cfg.Mongo.Coll)
+	log.Ok("Database connection established")
+
+	// init server
+	server := http.Server{
+		Addr:    cfg.HostAddr,
+		Handler: handlers.Mux(log, cfg, coll),
+	}
+
+	// start server
+	ch := make(chan error)
+
+	go func(ch chan error) {
+		log.Ok("Server listening on " + cfg.HostAddr)
+		ch <- server.ListenAndServe()
+	}(ch)
+
+	log.Error(<-ch)
 }

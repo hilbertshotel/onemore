@@ -54,33 +54,24 @@ const getHabits = async () => {
 }
 
 // CREATE HABIT
-const createHabit = (habit) => {
-    let out = []
-    
-    const habitSpan = document.createElement("span")
-    habitSpan.innerHTML = `${habit.Name} ${habit.Days}`
-    out.push(habitSpan)
+const create = (habit) => {
+    const habitDiv = document.createElement("div")
+    habitDiv.innerHTML = `${habit.Name} ${habit.Days} (${habit.Streak})`
+    habitDiv.id = "habit"
     
     if (!habit.Inc) {
-        const button = document.createElement("button")
-        button.innerHTML = "+"
-        button.onclick = () => { updateHabit(habit.Id, button, habit, habitSpan) }
-        out.push(button)
+      habitDiv.style.backgroundColor = "greenyellow"
+      habitDiv.onclick = () => { updateHabit(habit.Id, button, habit, habitSpan) }
     }
-
-    const br = document.createElement("br")
-    out.push(br)
-
-    return out
+    
+    return habitDiv
 }
 
 // ADD HABITS TO DOM
 const addToDom = (habits) => {
   for (const habit of habits) {
-    const h = createHabit(habit)
-    for (const e of h) {
-      HABITS_DIV.append(e)
-    }
+    HABITS_DIV.append(create(habit))
+    HABITS_DIV.append(document.createElement("br"))
   }
 }
 

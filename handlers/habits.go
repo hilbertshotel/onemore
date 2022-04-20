@@ -9,9 +9,11 @@ import (
 	"onemore/logger"
 	"strconv"
 	"strings"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger) {
+func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, coll *mongo.Collection) {
 	w.Header().Set("content-type", "application/json")
 
 	var path []string
@@ -23,13 +25,15 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger) {
 
 	// GET HABITS
 	if len(path) == 1 && r.Method == http.MethodGet {
-		habits, err := habit.Get()
+		// get all habits from database
+		habits, err := habit.Get(coll)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Error(err)
 			return
 		}
 
+		// marshal data
 		out, err := json.Marshal(habits)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
@@ -37,6 +41,7 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger) {
 			return
 		}
 
+		// return data to frontend
 		w.Write(out)
 		return
 	}
@@ -50,7 +55,7 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger) {
 			return
 		}
 
-		err = habit.Put(id)
+		err = habit.Increment(id, coll)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Error(err)
@@ -64,6 +69,7 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger) {
 
 	// POST HABIT
 	if len(path) == 1 && r.Method == http.MethodPost {
+		// read request body
 		data, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
@@ -71,6 +77,7 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger) {
 			return
 		}
 
+		// unmarshal request body
 		var newHabitName string
 		err = json.Unmarshal(data, &newHabitName)
 		if err != nil {
@@ -79,13 +86,15 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger) {
 			return
 		}
 
-		habit, err := habit.Post(newHabitName)
+		// post data to db and retrieve it
+		habit, err := habit.Post(newHabitName, coll)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Error(err)
 			return
 		}
 
+		// marshal data
 		out, err := json.Marshal(habit)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
@@ -93,6 +102,7 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger) {
 			return
 		}
 
+		// return data to frontend
 		w.Write(out)
 		msg := fmt.Sprintf("Added new habit: %v", newHabitName)
 		log.Ok(msg)
