@@ -3,19 +3,35 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet"> 
+        
         <link rel="stylesheet" href="style.css">
         <title>onemore</title>
     </head>
     <body>
 
+      <div id="box">
         <h1>onemore</h1>
 
         <div id="add">
-            <input id="new_habit" autofocus placeholder="add habit" maxlength="30">
+            <input id="new_habit" autofocus placeholder="add habit" maxlength="10">
             <button onclick="postHabit()">+</button>
         </div>
         
-        <div id="habits"></div>
+        <div id="habits">
+
+          <!-- <div class="habit" id="inc">nodrugs = 13</div>
+          <div class="habit" id="inc">stretch = 3</div>
+          <div class="habit" id="no_inc">run = 17</div>
+          <div class="habit" id="inc">ag = 8</div>
+          <div class="habit" id="inc">sleep = 1</div> -->
+
+        </div>
+
+      </div>
 
         <script src="script.js"></script>
     </body>

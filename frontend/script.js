@@ -4,17 +4,15 @@ const ADDR = "http://127.0.0.1:7696"
 const HABITS_DIV = document.getElementById("habits")
 
 // PUT HABIT
-const updateHabit = async (id, button, habit, habitSpan) => {
-    const data = {method: "PUT"}
-    const response = await fetch(`${ADDR}/habits/${id}`, data)
-    
+const updateHabit = async (habit, habitDiv) => {
+    const response = await fetch(`${ADDR}/habits/${habit.Id}`, {method: "PUT"})
     if (!response.ok) {
       console.log(`status: ${response.status} text: ${response.statusText}`)
       return
     }
 
-    button.remove()
-    habitSpan.innerHTML = `${habit.Name} ${habit.Days+=1}`
+    habitDiv.innerHTML = `${habit.Name} = ${habit.Days+=1}`
+    habitDiv.id = ""
 }
 
 // POST HABIT
@@ -56,12 +54,12 @@ const getHabits = async () => {
 // CREATE HABIT
 const create = (habit) => {
     const habitDiv = document.createElement("div")
-    habitDiv.innerHTML = `${habit.Name} ${habit.Days} (${habit.Streak})`
-    habitDiv.id = "habit"
-    
+    habitDiv.innerHTML = `${habit.Name} = ${habit.Days}`
+    habitDiv.className = "habit"
+
     if (!habit.Inc) {
-      habitDiv.style.backgroundColor = "greenyellow"
-      habitDiv.onclick = () => { updateHabit(habit.Id, button, habit, habitSpan) }
+      habitDiv.id = "no_inc"
+      habitDiv.onclick = () => { updateHabit(habit, habitDiv) }
     }
     
     return habitDiv
@@ -71,7 +69,6 @@ const create = (habit) => {
 const addToDom = (habits) => {
   for (const habit of habits) {
     HABITS_DIV.append(create(habit))
-    HABITS_DIV.append(document.createElement("br"))
   }
 }
 

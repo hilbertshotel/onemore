@@ -12,7 +12,9 @@ func Increment(id int, coll *mongo.Collection) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	_, err := coll.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"inc": true}})
+	t := time.Now().Format(time.RFC3339)
+	update := bson.M{"$set": bson.M{"inc": true, "lastInc": t}}
+	_, err := coll.UpdateOne(ctx, bson.M{"_id": id}, update)
 	if err != nil {
 		return err
 	}

@@ -26,10 +26,9 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
 	// GET HABITS
 	if len(path) == 1 && r.Method == http.MethodGet {
 		// get all habits from database
-		habits, err := habit.Get(coll)
+		habits, err := habit.Get(coll, log)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
-			log.Error(err)
 			return
 		}
 
@@ -87,10 +86,9 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
 		}
 
 		// post data to db and retrieve it
-		habit, err := habit.Post(newHabitName, coll)
+		habit, err := habit.Post(newHabitName, coll, log)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
-			log.Error(err)
 			return
 		}
 

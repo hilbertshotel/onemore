@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"onemore/logger"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Post(name string, coll *mongo.Collection) (Habit, error) {
+func Post(name string, coll *mongo.Collection, log *logger.Logger) (Habit, error) {
 	// create ctx
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -20,12 +21,15 @@ func Post(name string, coll *mongo.Collection) (Habit, error) {
 	var habit Habit
 	count, err := coll.CountDocuments(ctx, bson.M{"name": name})
 	if err != nil {
-		return habit, nil
+		log.Error(err)
+		return habit, err
 	}
 
 	if count != 0 {
 		msg := fmt.Sprintf("entry already exists (%v)", name)
-		return habit, errors.New(msg)
+		err := errors.New(msg)
+		log.Error(err)
+		return habit, err
 	}
 
 	// create new habit
@@ -34,7 +38,6 @@ func Post(name string, coll *mongo.Collection) (Habit, error) {
 	habit = Habit{
 		Name:    name,
 		Days:    1,
-		Streak:  1,
 		Inc:     true,
 		Active:  true,
 		LastInc: now.Format(time.RFC3339),
@@ -44,6 +47,7 @@ func Post(name string, coll *mongo.Collection) (Habit, error) {
 	// insert into collection
 	res, err := coll.InsertOne(ctx, habit)
 	if err != nil {
+		log.Error(err)
 		return habit, err
 	}
 
