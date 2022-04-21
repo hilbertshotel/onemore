@@ -3,17 +3,12 @@ package habit
 import (
 	"context"
 	"onemore/logger"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Get(coll *mongo.Collection, log *logger.Logger) ([]Habit, error) {
-	// create context
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
+func Get(coll *mongo.Collection, log *logger.Logger, ctx context.Context) ([]Habit, error) {
 	// get all entries in habits collection
 	cursor, err := coll.Find(ctx, bson.M{})
 	if err != nil {
@@ -28,7 +23,7 @@ func Get(coll *mongo.Collection, log *logger.Logger) ([]Habit, error) {
 	}
 
 	// handle expirations
-	habits, err := handleExpirations(rawData, coll)
+	habits, err := handleExpirations(rawData, coll, ctx)
 	if err != nil {
 		log.Error(err)
 		return rawData, err

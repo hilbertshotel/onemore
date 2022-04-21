@@ -12,12 +12,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Post(name string, coll *mongo.Collection, log *logger.Logger) (Habit, error) {
+func Post(name string, coll *mongo.Collection, log *logger.Logger, ctx context.Context) (Habit, error) {
 	var habit Habit
-
-    // create ctx
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
 
     // if name too long
     if len(name) > 10 {

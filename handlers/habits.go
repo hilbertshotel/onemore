@@ -8,8 +8,9 @@ import (
 	"onemore/habit"
 	"onemore/logger"
 	"strings"
-   
- //   "go.mongodb.org/mongo-driver/bson"
+    "time"
+    "context"
+
     "go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -17,6 +18,7 @@ import (
 func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, coll *mongo.Collection) {
 	w.Header().Set("content-type", "application/json")
 
+    // unpack url
 	var path []string
 	for _, v := range strings.Split(r.URL.Path, "/") {
 		if v != "" {
@@ -24,10 +26,19 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
 		}
 	}
 
-	// GET HABITS
-	if len(path) == 1 && r.Method == http.MethodGet {
+    // handle wrong url
+    if len(path) != 1 {
+        http.NotFound(w, r)    
+    }
+
+    // create context for db
+    ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+    defer cancel()
+
+	// GET
+	if r.Method == http.MethodGet {
 		// get all habits from database
-		habits, err := habit.Get(coll, log)
+		habits, err := habit.Get(coll, log, ctx)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			return
@@ -46,10 +57,11 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
 		return
 	}
 
-	// PUT HABIT
-	if len(path) == 1 && r.Method == http.MethodPut {
+	// PUT
+	if r.Method == http.MethodPut {
 		var id primitive.ObjectID
-
+        
+        // unpack request data
         body, err := ioutil.ReadAll(r.Body)
         if err != nil {
             http.Error(w, "Inernatl Server Error", 500)
@@ -57,6 +69,7 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
             return
         }
 
+        // unmarshal request data
         err = json.Unmarshal(body, &id)
         if err != nil {
             http.Error(w, "Internal Server Error", 500)
@@ -64,20 +77,21 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
             return
         }
 
-		err = habit.Increment(id, coll)
+        // increment habit
+		err = habit.Increment(id, coll, ctx)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Error(err)
 			return
 		}
-
+        
 		msg := fmt.Sprintf("Incremented habit with id: %v", id)
 		log.Ok(msg)
 		return
 	}
 
-	// POST HABIT
-	if len(path) == 1 && r.Method == http.MethodPost {
+	// POST
+	if r.Method == http.MethodPost {
 		// read request body
 		data, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -87,8 +101,8 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
 		}
 
 		// unmarshal request body
-		var newHabitName string
-		err = json.Unmarshal(data, &newHabitName)
+		var name string
+		err = json.Unmarshal(data, &name)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Error(err)
@@ -96,7 +110,7 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
 		}
 
 		// post data to db and retrieve it
-		habit, err := habit.Post(newHabitName, coll, log)
+		habit, err := habit.Post(name, coll, log, ctx)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			return
@@ -112,7 +126,7 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
 
 		// return data to frontend
 		w.Write(out)
-		msg := fmt.Sprintf("Added new habit: %v", newHabitName)
+		msg := fmt.Sprintf("Added new habit: %v", name)
 		log.Ok(msg)
 		return
 	}
