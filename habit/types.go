@@ -9,7 +9,5 @@ type Habit struct {
 	Name    string             `bson:"name"`
 	Days    int                `bson:"days"`
 	Inc     bool               `bson:"inc"`
-	Active  bool               `bson:"active"`
 	LastInc string             `bson:"last_inc"`
-	Created string             `bson:"created"`
 }

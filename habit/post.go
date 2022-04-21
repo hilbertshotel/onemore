@@ -41,15 +41,11 @@ func Post(name string, coll *mongo.Collection, log *logger.Logger) (Habit, error
 	}
 
 	// create new habit
-	now := time.Now()
-
 	habit = Habit{
 		Name:    name,
 		Days:    1,
 		Inc:     true,
-		Active:  true,
-		LastInc: now.Format(time.RFC3339),
-		Created: fmt.Sprintf("%v %v %v", now.Year(), now.Month(), now.Day()),
+		LastInc: time.Now().Format(time.RFC3339),
 	}
 
 	// insert into collection

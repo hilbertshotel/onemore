@@ -36,12 +36,11 @@ func decrement(habit Habit, coll *mongo.Collection) error {
 	return nil
 }
 
-func deactivate(habit Habit, coll *mongo.Collection) error {
+func delete(habit Habit, coll *mongo.Collection) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	update := bson.M{"$set": bson.M{"active": false, "days": 0}}
-	_, err := coll.UpdateOne(ctx, bson.M{"_id": habit.Id}, update)
+	_, err := coll.DeleteOne(ctx, bson.M{"_id": habit.Id})
 	if err != nil {
 		return err
 	}
