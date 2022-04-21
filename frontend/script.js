@@ -1,6 +1,4 @@
-// HOST ADDRESS
-// const ADDR = "http://3.72.23.143"
-const ADDR = "http://127.0.0.1:7696"
+// GLOBALS
 const HABITS_DIV = document.getElementById("habits")
 
 // PUT HABIT
@@ -17,11 +15,12 @@ const updateHabit = async (habit, habitDiv) => {
 
 // POST HABIT
 const postHabit = async () => {
-    const inputValue = document.getElementById("new_habit").value
+    const inputTag = document.getElementById("new_habit")
+    const inputValue = inputTag.value
     if (inputValue === "") {
       return
     }
-
+    
     const data = { 
       method: "POST",
       headers: { 
@@ -35,7 +34,8 @@ const postHabit = async () => {
       console.log(`status: ${response.status} text: ${response.statusText}`)
       return
     }
-
+    
+    inputTag.value = ""
     const habit = await response.json()
     addToDom([habit])
 }
