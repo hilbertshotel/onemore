@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"onemore/habit"
 	"onemore/logger"
-	"strconv"
 	"strings"
-
+   
+ //   "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -46,13 +47,22 @@ func habitsHandler(w http.ResponseWriter, r *http.Request, log *logger.Logger, c
 	}
 
 	// PUT HABIT
-	if len(path) == 2 && r.Method == http.MethodPut {
-		id, err := strconv.Atoi(path[1])
-		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Error(err)
-			return
-		}
+	if len(path) == 1 && r.Method == http.MethodPut {
+		var id primitive.ObjectID
+
+        body, err := ioutil.ReadAll(r.Body)
+        if err != nil {
+            http.Error(w, "Inernatl Server Error", 500)
+            log.Error(err)
+            return
+        }
+
+        err = json.Unmarshal(body, &id)
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Error(err)
+            return
+        }
 
 		err = habit.Increment(id, coll)
 		if err != nil {

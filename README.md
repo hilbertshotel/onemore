@@ -16,6 +16,6 @@ Info:
     practiced a habit for 300 days, skip one day and your streak
     is lost. Don't be fooled by achievements. The past is irrelevant.
 
-Stack:
+Tech:
   HTML, CSS, Javascript, Golang, MongoDB, Nginx, Systemd, AWS Lightsail
 ```

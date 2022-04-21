@@ -13,12 +13,20 @@ import (
 )
 
 func Post(name string, coll *mongo.Collection, log *logger.Logger) (Habit, error) {
-	// create ctx
+	var habit Habit
+
+    // create ctx
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
+    // if name too long
+    if len(name) > 10 {
+        err := errors.New("name out of bounds")
+        log.Error(err)
+        return habit, err
+    }
+
 	// if habit already exists return error
-	var habit Habit
 	count, err := coll.CountDocuments(ctx, bson.M{"name": name})
 	if err != nil {
 		log.Error(err)

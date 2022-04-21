@@ -3,7 +3,13 @@ const HABITS_DIV = document.getElementById("habits")
 
 // PUT HABIT
 const updateHabit = async (habit, habitDiv) => {
-    const response = await fetch(`${ADDR}/habits/${habit.Id}`, {method: "PUT"})
+    const data = {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(habit.Id)
+    }
+
+    const response = await fetch(`${ADDR}/habits/`, data)
     if (!response.ok) {
       console.log(`status: ${response.status} text: ${response.statusText}`)
       return
