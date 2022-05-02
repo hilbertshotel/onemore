@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
 	"context"
 	"net/http"
 	"onemore/config"
@@ -15,11 +16,9 @@ func main() {
 
 	// init logger
 	log := logger.Init()
-	log.Ok("Logger initiated")
 
 	// init config
 	cfg := config.Init()
-	log.Ok("Config initiated")
 
 	// connect to database
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Mongo.Timeout)
@@ -33,7 +32,6 @@ func main() {
 	defer client.Disconnect(ctx)
 
 	coll := client.Database(cfg.Mongo.Database).Collection(cfg.Mongo.Coll)
-	log.Ok("Database connection established")
 
 	// init server
 	server := http.Server{
@@ -45,7 +43,8 @@ func main() {
 	ch := make(chan error)
 
 	go func(ch chan error) {
-		log.Ok("Server listening on " + cfg.HostAddr)
+        fmt.Println()
+        log.Ok("API START: " + cfg.HostAddr)
 		ch <- server.ListenAndServe()
 	}(ch)
 

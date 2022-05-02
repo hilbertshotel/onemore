@@ -11,7 +11,7 @@ import (
 
 func Increment(id primitive.ObjectID, coll *mongo.Collection, ctx context.Context) error {
 	t := time.Now().Format(time.RFC3339)
-    update := bson.M{"$set": bson.M{"inc": true, "lastInc": t}, "$inc": bson.M{"days": 1}}
+    update := bson.M{"$set": bson.M{"inc": true, "last_inc": t}, "$inc": bson.M{"days": 1}}
 	_, err := coll.UpdateOne(ctx, bson.M{"_id": id}, update)
 	if err != nil {
 		return err
